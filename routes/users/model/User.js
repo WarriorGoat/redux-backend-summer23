@@ -5,8 +5,16 @@ const {v4: uuidv4} = require("uuid")
 const userSchema = new mongoose.Schema({
     id: {type: String, 
         default: ()=>uuidv4()},
-    username: String,
-    password: String,
+    firstname: {type: String,
+      required: true},
+    lastname: {type: String,
+      required: true},
+    email: {type: String,
+      unique: true,
+      required: true
+    },
+    password: {type: String,
+      required: true},
     permissions: String,
     createdAt: {type: Date, 
         default: Date.now},

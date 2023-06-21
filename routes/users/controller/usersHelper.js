@@ -5,9 +5,12 @@ const saltRounds = 10;
 
 const createUser = async(params)=>{
     let newUser = new User({
-        username: params.username,
+        firstname: params.firstname,
+        lastname: params.lastname,
+        email: params.email,
         password: params.password,
         permissions: params.permissions
+        
     })
     return newUser
 }

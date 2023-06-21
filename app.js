@@ -8,7 +8,7 @@ require ("dotenv").config()
 
 const mongoose = require ("mongoose")
 
-mongoose.connect(process.env.MONGODB_URI, {dbName: "login-contxt"}) 
+mongoose.connect(process.env.MONGODB_URI, {dbName: "redux-backend"}) 
   .then(()=> console.log("Connected to MongoDB on Port: " + process.env.PORT))
   .catch((error)=>console.log(error))
 

@@ -1,4 +1,4 @@
- const express = require('express');
+const express = require('express');
 const router = express.Router();
 const usersController = require('./controller/usersController');
 const { verifyToken } = require("../../middleware/authorization")
@@ -8,14 +8,14 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
-router.get('/login-test', function(req, res) {
+router.get('/signin-test', function(req, res) {
   console.log(req.body)
   res.send({
-    username: req.body.username
+    email: req.body.email
   });
 });
 
-router.post('/login', usersController.login)
+router.post('/signin', usersController.signin)
 
 router.post('/register', usersController.register)
 

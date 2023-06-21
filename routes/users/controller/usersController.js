@@ -3,16 +3,16 @@ const jwt = require("jsonwebtoken");
 const { createUser, hashPassword, comparePasswords } = require("./usersHelper");
 
 module.exports = {
-  login: async (req, res) => {
+  signin: async (req, res) => {
     try {
       // console.log(req.body);
-      let foundUser = await User.findOne({username: req.body.username})
-            if (!foundUser) {
-        throw {
-          status: 404,
-          message: "User Not Found",
-        };
-      }
+      let foundUser = await User.findOne({ email: req.body.email });
+      // if (!foundUser) {
+      //   throw {
+      //     status: 404,
+      //     message: "User Not Found",
+      //   };
+      // }
 
       let checkedPassword = await comparePasswords(
         req.body.password,
@@ -22,20 +22,25 @@ module.exports = {
         throw {
           status: 401,
           message: "Invalid Password",
-        };  
+        };
       }
       let payload = {
         id: foundUser._id,
-        username: foundUser.username
-    }
+        email: foundUser.email,
+      };
 
-    let token = await jwt.sign(payload, process.env.SUPER_SECRET_KEY, {expiresIn: 10*60})
-    
+      let token = await jwt.sign(payload, process.env.SUPER_SECRET_KEY, {
+        expiresIn: 60 * 60,
+      });
+      // console.log(foundUser)
       res.status(200).json({
-        username: req.body.username,
-        password: req.body.password,
+        user: {
+          email: foundUser.email,
+          firstname: foundUser.firstname,
+          lastname: foundUser.lastname
+        },
         message: "Successful Login!!",
-        token: token
+        token: token,
       });
     } catch (error) {
       res.status(error.status).json(error.message);
@@ -44,54 +49,49 @@ module.exports = {
 
   register: async (req, res) => {
     try {
-      let foundUser = await User.findOne({ username: req.body.username });
+      //is user email exists, throw an error
+      let foundUser = await User.findOne({ email: req.body.email });
       if (foundUser) {
         throw {
           status: 409,
-          message: "User already exists, please enter a unique user name.",
+          message: "User already exists, please enter a unique email.",
         };
+      } else {
+        let newUser = await createUser(req.body);
+        let hashedPassword = await hashPassword(newUser.password);
+        newUser.password = hashedPassword;
+        let savedUser = await newUser.save();
+        res.status(200).json({
+          // userObj: savedUser,  this sends too much info as includes the password hash
+          email: savedUser.email,
+          firstname: savedUser.firstname,
+          lastname: savedUser.lastname,
+          message: "Successfully Registered!  Please Log In.",
+        });
       }
-      let newUser = await createUser(req.body);
-      let hashedPassword = await hashPassword(newUser.password);
-      newUser.password = hashedPassword;
-      let savedUser = await newUser.save();
-      res.status(200).json({
-        userObj: savedUser,
-        message: "Successfully Registered!  Please Log In.",
-      });
     } catch (error) {
-      res.status(error.status).json(error.message);
+      // res.status(error.status).json(error.message);
+      console.log(error);
     }
   },
   authtoken: async (req, res) => {
     let foundUser = await User.findById(req.decoded.id);
 
     res.status(200).json({
-      username: foundUser.username,
+      email: foundUser.email,
+      firstname: foundUser.firstname,
+      lastname: foundUser.lastname,
       message: "Successful Token Login!!",
       // token: token,
     });
-    res.send('Authtoken')
+    // res.send('Authtoken')
   },
-
-
-
 
   deleteUser: async (req, res) => {
     try {
       // console.log(req.body);
-      let foundUser = await User.findByIdAndDelete(req.decoded.
-        id)
-            if (!foundUser) {
-        throw {
-          status: 404,
-          message: "User Not Found",
-        };
-      }
-      let payload = {
-        id: foundUser.id,
-        username: foundUser.username
-    }
+      let foundUser = await User.findByIdAndDelete(req.decoded.id);
+      res.send(true);
     } catch (error) {
       res.status(error.status).json(error.message);
     }
