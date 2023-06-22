@@ -1,28 +1,28 @@
-const User = require('../model/User')
-const {v4: uuidv4 } = require('uuid')
-const bcrypt = require ("bcrypt")
+const User = require("../model/User");
+const { v4: uuidv4 } = require("uuid");
+const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
-const createUser = async(params)=>{
-    let newUser = new User({
-        firstname: params.firstname,
-        lastname: params.lastname,
-        email: params.email,
-        password: params.password,
-        permissions: params.permissions
-        
-    })
-    return newUser
-}
+const createUser = async (params) => {
+  let newUser = new User({
+    firstname: params.firstname,
+    lastname: params.lastname,
+    email: params.email,
+    password: params.password,
+    permissions: params.permissions,
+  });
+  return newUser;
+};
 
-const hashPassword = (password)=>{
-    return bcrypt.hash(password, saltRounds)
-}
+const hashPassword = (password) => {
+  return bcrypt.hash(password, saltRounds);
+};
 
-const comparePasswords = (plaintextPassword, dbPassword) => bcrypt.compare(plaintextPassword, dbPassword)
+const comparePasswords = (plaintextPassword, dbPassword) =>
+  bcrypt.compare(plaintextPassword, dbPassword);
 
-
-module.exports = { 
-    createUser, 
-    hashPassword, 
-    comparePasswords }
+module.exports = {
+  createUser,
+  hashPassword,
+  comparePasswords,
+};
